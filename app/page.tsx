@@ -6,7 +6,7 @@ export default function Home() {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">세븐나이츠-리버스</h1>
         <p className="text-muted">
-          자주 쓰는 기능을 카드로 빠르게 이동할 수 있어요.
+          자주 쓰는 기능을 카드로 빠르게 이동할 수 있습니다.
         </p>
       </div>
 

@@ -1,9 +1,14 @@
+import { PageContainer } from "../_components/PageContainer";
+import { ZzolCalculatorShell } from "./_components/ZzolCalculatorShell";
+
 export default function ZzolPage() {
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-6 py-16">
-      <h1 className="text-2xl font-semibold tracking-tight">쫄작</h1>
-      <p className="text-muted">준비 중입니다.</p>
-    </main>
+    <PageContainer>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-semibold tracking-tight">쫄작 계산기</h1>
+      </div>
+      <ZzolCalculatorShell />
+    </PageContainer>
   );
 }
 
