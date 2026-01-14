@@ -1,73 +1,53 @@
 import type { ZzolFormState, ZzolResults } from "./types";
-
-/**
- * 쫄몹 관련 상수
- */
-const ZZOL_MONSTER_COUNT = 8;
-const ZZOL_SPEND_KEY_PER_GAME = 12;
-
-/**
- * 열쇠 획득량 상수
- */
-const WEEKEND_PUSH_KEY_COUNT = 200; // 주말 푸시보상 (1주에 200개)
-const ATTEMP_300_PER_DAILY_KEY_COUNT = 24; // 300일 출석표(10일에 240개, 1일에 24개)
-const UPDATE_KEY_COUNT = 100; // 정기정검 보상 열쇠(2주에 100개)
-const RELAY_KEY_COUNT = 30; // 릴레이 열쇠(2주에 30개)
-
-/**
- * 루비 획득량 상수
- */
-const ATTEMP_300_PER_DAILY_RUBY_COUNT = 20; // 300일 출석표(10일에 200루비, 1일에 20루비)
-const WEEKEND_BOOST_RUBY_COUNT = 100; // 주말 부스트 루비(1주에 100루비)
-const RELAY_RUBY_COUNT = 50; // 릴레이 루비(2주에 50루비)
-
+import { constants } from "./constants";
 
 /**
  * 쫄작 계산기 결과 계산
  * - SRP: React/UI와 분리된 순수 함수로 유지
  */
 export function calcZzolResults(_state: ZzolFormState): ZzolResults {
-  let dailyGetKeyCount: number = 0; // 하루 총 열쇠 획득량
-  let dailySpendKeyCount: number = 0; // 하루 총 열쇠 소비량
-  let dailyGetRubyCount: number = 0; // 하루 총 루비 획득량
-  let dailySpendRubyCount: number = 0; // 하루 총 루비 소비량
+  let fourWeeksGetKeyCount: number = 0; // 4주 총 열쇠 획득량
+  let fourWeeksGetRubyCount: number = 0; // 4주 총 루비 획득량
+  let fourWeeksSpendKeyCount: number = 0; // 4주 총 열쇠 소비량
+  let fourWeeksSpendRubyCount: number = 0; // 4주 총 루비 소비량
 
-  dailyGetKeyCount += getDailyKeyCount(_state) + ATTEMP_300_PER_DAILY_KEY_COUNT
-  console.log('일일 열쇠 획득량(기본): ', dailyGetKeyCount);
-  dailyGetRubyCount += getDailyRubyCount(_state) + ATTEMP_300_PER_DAILY_RUBY_COUNT
-  console.log('일일 루비 획득량(기본): ', dailyGetRubyCount);
+  fourWeeksGetKeyCount += (getDailyKeyCount(_state) + constants.ATTEMP_300_KEY_COUNT_PER_DAILY) * 28
+                                                    + constants.WEEKEND_PUSH_KEY_COUNT * 4
+                                                    + constants.UPDATE_KEY_COUNT_PER_2WEEKS * 2
+                                                    + constants.RELAY_KEY_COUNT_PER_2WEEKS * 2;
+  fourWeeksGetRubyCount += (getDailyRubyCount(_state) + constants.ATTEMP_300_RUBY_COUNT_PER_DAILY) * 28
+                                                      + constants.WEEKEND_BOOST_RUBY_COUNT * 4
+                                                      + constants.RELAY_RUBY_COUNT_PER_2WEEKS * 2
+                                                      + constants.MONTHLY_RUBY_RUBY_COUNT * 1
+                                                      + constants.MONTHLY_KEY_RUBY_COUNT * 1;
 
   const keyFromRuby: { dailySpendRuby: number, keyCount: number } = getDailyRubySpendForKey(_state);
-  dailyGetKeyCount += keyFromRuby.keyCount;
-  console.log('일일 열쇠 획득량(루비로 열쇠 구매): ', dailyGetKeyCount);
-  dailySpendRubyCount += keyFromRuby.dailySpendRuby;
-  console.log('일일 루비 소비량(루비로 열쇠 구매): ', dailySpendRubyCount);
+
+  fourWeeksGetKeyCount += keyFromRuby.keyCount * 28;
+  fourWeeksSpendRubyCount += keyFromRuby.dailySpendRuby * 28
 
   const rubyFromZzol: { oneCycleGetRuby: number, oneCycleSpendKey: number, oneCycleCount: number } = getDailyRubyFromZzol(_state);
-  const totalZzolCycleCount: number = Math.floor(dailyGetKeyCount/rubyFromZzol.oneCycleSpendKey); // 총 쫄작 사이클 횟수
+  const totalZzolCycleCount: number = fourWeeksGetKeyCount/rubyFromZzol.oneCycleSpendKey; // 총 쫄작 사이클 횟수
   const totalZzolGameCount: number = totalZzolCycleCount * rubyFromZzol.oneCycleCount; // 총 쫄작 게임 횟수
-  const totalZzolCount: number = totalZzolCycleCount * ZZOL_MONSTER_COUNT; // 총 쫄몹 
-  const spendKeyForZzol: number = totalZzolGameCount * ZZOL_SPEND_KEY_PER_GAME; // 쫄작에 사용하는 총 열쇠 개수
+  const totalZzolCount: number = totalZzolCycleCount * constants.ZZOL_MONSTER_COUNT; // 총 쫄몹
+  const spendKeyForZzol: number = totalZzolGameCount * constants.ZZOL_SPEND_KEY_PER_GAME; // 쫄작에 사용하는 총 열쇠 개수
   const getRubyForZzol: number = rubyFromZzol.oneCycleGetRuby * totalZzolCycleCount; // 쫄작에서 획득하는 총 루비 개수
+  
+  fourWeeksSpendKeyCount += spendKeyForZzol; // 쫄작에 사용하는 열쇠 개수 추가
+  fourWeeksGetRubyCount += getRubyForZzol; // 쫄작에서 획득하는 루비 개수 추가
 
-  dailySpendKeyCount += spendKeyForZzol; // 쫄작에 사용하는 열쇠 개수 추가
-  console.log('일일 열쇠 소비량(쫄작): ', spendKeyForZzol);
-  console.log('총 쫄작 완료 횟수: ', totalZzolCycleCount);
-  dailyGetRubyCount += getRubyForZzol; // 쫄작에서 획득하는 루비 개수 추가
-  console.log('일일 루비 획득량(쫄작): ', getRubyForZzol);
-
-  const dailyGetRuby: number = dailyGetRubyCount - dailySpendRubyCount;
+  const fourWeeksGetRuby: number = Math.floor(fourWeeksGetRubyCount - fourWeeksSpendRubyCount);
 
   return {
     rubyNetProfit: {
-      dailyAvg: dailyGetRuby.toString(),
-      weeks2: (dailyGetRuby * 14).toString(),
-      weeks4: (dailyGetRuby * 28).toString(),
+      dailyAvg: Math.floor(fourWeeksGetRuby/28).toString(),
+      weeks2: Math.floor(fourWeeksGetRuby/2).toString(),
+      weeks4: (fourWeeksGetRuby).toString(),
     },
     levelingMobs: {
-      dailyAvg: totalZzolCount.toString(),
-      weeks2: (totalZzolCount * 14).toString(),
-      weeks4: (totalZzolCount * 28).toString(),
+      dailyAvg: Math.floor(totalZzolCount/28).toString(),
+      weeks2: Math.floor(totalZzolCount/2).toString(),
+      weeks4: Math.floor(totalZzolCount).toString(),
     },
     nightmareLegendAccessoryCeiling: {
       duration: '0일',
@@ -126,7 +106,7 @@ function getDailyRubySpendForKey(state: ZzolFormState ): { dailySpendRuby: numbe
   let keyCount: number = 0;
 
   for(let i=startIdx; i>=0; i--) {
-    dailySpendRuby += Number(priceParam) * RUBYDAN_AMOUNT[ORDER[i]];
+    dailySpendRuby += Number(ORDER[i]) * RUBYDAN_AMOUNT[ORDER[i]];
     keyCount += RUBYDAN_AMOUNT[ORDER[i]] * 60;
   }
 
@@ -140,7 +120,7 @@ function getDailyRubySpendForKey(state: ZzolFormState ): { dailySpendRuby: numbe
  */
 function getDailyRubyFromZzol(state: ZzolFormState): { oneCycleGetRuby: number, oneCycleSpendKey: number, oneCycleCount: number } {
   const oneCycleCount: number = getOneCycleZzol(state.isRubyMonthly);
-  const oneCycleSpendKey = oneCycleCount * ZZOL_SPEND_KEY_PER_GAME; // 쫄작 만렙 한 사이클 열쇠 소모량
+  const oneCycleSpendKey = oneCycleCount * constants.ZZOL_SPEND_KEY_PER_GAME; // 쫄작 만렙 한 사이클 열쇠 소모량
   const oneCycleGetRuby: number = 160; // 쫄작 만렙 한 사이클 루비 획득량
 
   return { oneCycleGetRuby, oneCycleSpendKey, oneCycleCount };

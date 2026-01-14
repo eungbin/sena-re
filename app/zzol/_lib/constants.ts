@@ -1,0 +1,36 @@
+/**
+ * 쫄몹 관련 상수
+ */
+const ZZOL_MONSTER_COUNT = 8;
+const ZZOL_SPEND_KEY_PER_GAME = 12;
+
+/**
+ * 열쇠 획득량 상수
+ */
+const ATTEMP_300_KEY_COUNT_PER_DAILY = 24; // 300일 출석표(10일에 240개, 1일에 24개)
+const WEEKEND_PUSH_KEY_COUNT = 200; // 주말 푸시보상 (1주에 200개)
+const UPDATE_KEY_COUNT_PER_2WEEKS = 100; // 정기정검 보상 열쇠(2주에 100개)
+const RELAY_KEY_COUNT_PER_2WEEKS = 30; // 릴레이 열쇠(2주에 30개)
+
+/**
+ * 루비 획득량 상수
+ */
+const ATTEMP_300_RUBY_COUNT_PER_DAILY = 20; // 300일 출석표(10일에 200루비, 1일에 20루비)
+const WEEKEND_BOOST_RUBY_COUNT = 100; // 주말 부스트 루비(1주에 100루비)
+const RELAY_RUBY_COUNT_PER_2WEEKS = 50; // 릴레이 루비(2주에 50루비)
+const MONTHLY_RUBY_RUBY_COUNT = 330; // 루비 월정액 구매 시 획득 루비 개수(4주에 330루비)
+const MONTHLY_KEY_RUBY_COUNT = 200; // 열쇠 월정액 구매 시 획득 루비 개수(4주에 200루비)
+
+export const constants = {
+  ZZOL_MONSTER_COUNT,
+  ZZOL_SPEND_KEY_PER_GAME,
+  ATTEMP_300_KEY_COUNT_PER_DAILY,
+  WEEKEND_PUSH_KEY_COUNT,
+  UPDATE_KEY_COUNT_PER_2WEEKS,
+  RELAY_KEY_COUNT_PER_2WEEKS,
+  ATTEMP_300_RUBY_COUNT_PER_DAILY,
+  WEEKEND_BOOST_RUBY_COUNT,
+  RELAY_RUBY_COUNT_PER_2WEEKS,
+  MONTHLY_RUBY_RUBY_COUNT,
+  MONTHLY_KEY_RUBY_COUNT,
+}
