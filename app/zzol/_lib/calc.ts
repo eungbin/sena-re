@@ -1,5 +1,6 @@
-import type { ZzolFormState, ZzolResults } from "./types";
+import type { ZzolFormState, ZzolResults, ZzolTotalWarTier, ZzolTowerMedal } from "./types";
 import { constants } from "./constants";
+import { convertFormatNumberWithComma, toNumberOrZero } from "@/app/_utils/number";
 
 /**
  * 쫄작 계산기 결과 계산
@@ -14,7 +15,12 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
   fourWeeksGetKeyCount += (getDailyKeyCount(_state) + constants.ATTEMP_300_KEY_COUNT_PER_DAILY) * 28
                                                     + constants.WEEKEND_PUSH_KEY_COUNT * 4
                                                     + constants.UPDATE_KEY_COUNT_PER_2WEEKS * 2
-                                                    + constants.RELAY_KEY_COUNT_PER_2WEEKS * 2;
+                                                    + constants.RELAY_KEY_COUNT_PER_2WEEKS * 2
+                                                    + toNumberOrZero(_state.weeklyHonorShopCount) * 60 * 4
+                                                    + toNumberOrZero(_state.weeklyGuildShopCount) * 60 * 4
+                                                    + toNumberOrZero(_state.monthlyArenaShopCount) * 60
+                                                    + toNumberOrZero(_state.monthlyGuildWarShopCount) * 60
+                                                    + toNumberOrZero(_state.monthlyTotalWarShopCount) * 60;
   fourWeeksGetRubyCount += (getDailyRubyCount(_state) + constants.ATTEMP_300_RUBY_COUNT_PER_DAILY) * 28
                                                       + constants.WEEKEND_BOOST_RUBY_COUNT * 4
                                                       + constants.RELAY_RUBY_COUNT_PER_2WEEKS * 2
@@ -24,7 +30,7 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
   const keyFromRuby: { dailySpendRuby: number, keyCount: number } = getDailyRubySpendForKey(_state);
 
   fourWeeksGetKeyCount += keyFromRuby.keyCount * 28;
-  fourWeeksSpendRubyCount += keyFromRuby.dailySpendRuby * 28
+  fourWeeksSpendRubyCount += keyFromRuby.dailySpendRuby * 28 + toNumberOrZero(_state.dailyRubySpend) * 28;
 
   const rubyFromZzol: { oneCycleGetRuby: number, oneCycleSpendKey: number, oneCycleCount: number } = getDailyRubyFromZzol(_state);
   const totalZzolCycleCount: number = fourWeeksGetKeyCount/rubyFromZzol.oneCycleSpendKey; // 총 쫄작 사이클 횟수
@@ -33,21 +39,21 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
   const spendKeyForZzol: number = totalZzolGameCount * constants.ZZOL_SPEND_KEY_PER_GAME; // 쫄작에 사용하는 총 열쇠 개수
   const getRubyForZzol: number = rubyFromZzol.oneCycleGetRuby * totalZzolCycleCount; // 쫄작에서 획득하는 총 루비 개수
   
-  fourWeeksSpendKeyCount += spendKeyForZzol; // 쫄작에 사용하는 열쇠 개수 추가
-  fourWeeksGetRubyCount += getRubyForZzol; // 쫄작에서 획득하는 루비 개수 추가
+  fourWeeksSpendKeyCount += spendKeyForZzol + toNumberOrZero(_state.dailyRaidCount) * 12;
+  fourWeeksGetRubyCount += getRubyForZzol + getRubyFromTotalWar(_state.totalWarTier) + getRubyFromTowerMedal(_state.towerMedal);
 
   const fourWeeksGetRuby: number = Math.floor(fourWeeksGetRubyCount - fourWeeksSpendRubyCount);
 
   return {
     rubyNetProfit: {
-      dailyAvg: Math.floor(fourWeeksGetRuby/28).toString(),
-      weeks2: Math.floor(fourWeeksGetRuby/2).toString(),
-      weeks4: (fourWeeksGetRuby).toString(),
+      dailyAvg: convertFormatNumberWithComma(fourWeeksGetRuby/28),
+      weeks2: convertFormatNumberWithComma(fourWeeksGetRuby/2),
+      weeks4: convertFormatNumberWithComma(fourWeeksGetRuby),
     },
     levelingMobs: {
-      dailyAvg: Math.floor(totalZzolCount/28).toString(),
-      weeks2: Math.floor(totalZzolCount/2).toString(),
-      weeks4: Math.floor(totalZzolCount).toString(),
+      dailyAvg: convertFormatNumberWithComma(totalZzolCount/28),
+      weeks2: convertFormatNumberWithComma(totalZzolCount/2),
+      weeks4: convertFormatNumberWithComma(totalZzolCount),
     },
     nightmareLegendAccessoryCeiling: {
       duration: '0일',
@@ -127,10 +133,33 @@ function getDailyRubyFromZzol(state: ZzolFormState): { oneCycleGetRuby: number, 
 }
 
 /**
- * 
  * @param isRubyMonthly - 루비월정액 여부(루비 월정액 결제 시 경험치10% 추가획득)
  * @returns - 루비월정액 여부에 따른 쫄 만렙 판수
  */
 function getOneCycleZzol(isRubyMonthly: boolean): number {
   return isRubyMonthly ? 10 : 11
+}
+
+function getRubyFromTotalWar(tier: ZzolTotalWarTier): number {
+  const RUBY_FROM_TOTAL_WAR = {
+    'normal': 200,
+    'advanced': 1200,
+    'rare': 2000,
+    'legend': 3000,
+  };
+  const ORDER: ('normal' | 'advanced' | 'rare' | 'legend')[] = ['normal', 'advanced', 'rare', 'legend'];
+  const startIdx = ORDER.indexOf(tier);
+  let ruby: number = 0;
+  for(let i=startIdx; i>=0; i--) {
+    ruby += RUBY_FROM_TOTAL_WAR[ORDER[i]];
+  }
+  return ruby * 2;
+}
+
+function getRubyFromTowerMedal(medal: ZzolTowerMedal): number {
+  const RUBY_FROM_TOWER_MEDAL = {
+    '90': 1200,
+    '120': 2000,
+  };
+  return RUBY_FROM_TOWER_MEDAL[medal];
 }

@@ -9,6 +9,7 @@ import type {
 import { ZzolButtonRadioGroup } from "./ZzolButtonRadioGroup";
 import { ZzolCheckbox } from "./ZzolCheckbox";
 import { ZzolNumberInput } from "./ZzolNumberInput";
+import { ZzolQuickValueButtons } from "./ZzolQuickValueButtons";
 import { ZzolSection } from "./ZzolSection";
 import { ZzolSelect } from "./ZzolSelect";
 
@@ -75,14 +76,31 @@ export function ZzolCalculator({ value, onChange }: ZzolCalculatorProps) {
           <ZzolNumberInput
             name="weeklyHonorShopCount"
             label="명예 상점 구매 횟수"
+            max={7}
             value={value.weeklyHonorShopCount}
             onValueChange={(v) => onChange("weeklyHonorShopCount", v)}
+            headerRight={
+              <ZzolQuickValueButtons
+                buttons={[{ label: "최대", value: 7 }]}
+                onSelect={(n) => onChange("weeklyHonorShopCount", n)}
+              />
+            }
           />
           <ZzolNumberInput
             name="weeklyGuildShopCount"
             label="길드 상점 구매 횟수"
+            max={12}
             value={value.weeklyGuildShopCount}
             onValueChange={(v) => onChange("weeklyGuildShopCount", v)}
+            headerRight={
+              <ZzolQuickValueButtons
+                buttons={[
+                  { label: "7개", value: 7 },
+                  { label: "최대", value: 12 },
+                ]}
+                onSelect={(n) => onChange("weeklyGuildShopCount", n)}
+              />
+            }
           />
         </div>
       </ZzolSection>
@@ -92,20 +110,41 @@ export function ZzolCalculator({ value, onChange }: ZzolCalculatorProps) {
           <ZzolNumberInput
             name="monthlyArenaShopCount"
             label="결투장 상점 구매 횟수"
+            max={28}
             value={value.monthlyArenaShopCount}
             onValueChange={(v) => onChange("monthlyArenaShopCount", v)}
+            headerRight={
+              <ZzolQuickValueButtons
+                buttons={[{ label: "최대", value: 28 }]}
+                onSelect={(n) => onChange("monthlyArenaShopCount", n)}
+              />
+            }
           />
           <ZzolNumberInput
             name="monthlyGuildWarShopCount"
             label="길드전 상점 구매 횟수"
+            max={10}
             value={value.monthlyGuildWarShopCount}
             onValueChange={(v) => onChange("monthlyGuildWarShopCount", v)}
+            headerRight={
+              <ZzolQuickValueButtons
+                buttons={[{ label: "최대", value: 10 }]}
+                onSelect={(n) => onChange("monthlyGuildWarShopCount", n)}
+              />
+            }
           />
           <ZzolNumberInput
             name="monthlyTotalWarShopCount"
             label="총력전 상점 구매 횟수"
+            max={10}
             value={value.monthlyTotalWarShopCount}
             onValueChange={(v) => onChange("monthlyTotalWarShopCount", v)}
+            headerRight={
+              <ZzolQuickValueButtons
+                buttons={[{ label: "최대", value: 10 }]}
+                onSelect={(n) => onChange("monthlyTotalWarShopCount", n)}
+              />
+            }
           />
         </div>
       </ZzolSection>

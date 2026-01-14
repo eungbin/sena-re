@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 type ZzolNumberInputProps = {
   name: string;
   label: string;
@@ -10,6 +12,8 @@ type ZzolNumberInputProps = {
   value?: number | "";
   onValueChange?: (value: number | "") => void;
   disabled?: boolean;
+  /** Optional right-side content shown next to the label (e.g. quick action buttons). */
+  headerRight?: ReactNode;
 };
 
 export function ZzolNumberInput({
@@ -24,15 +28,28 @@ export function ZzolNumberInput({
   value,
   onValueChange,
   disabled,
+  headerRight,
 }: ZzolNumberInputProps) {
   const inputId = id ?? name;
   const isControlled = typeof value === "number" || value === "";
 
+  const clampToRange = (n: number) => {
+    let next = n;
+    next = Math.max(min, next);
+    if (typeof max === "number") {
+      next = Math.min(max, next);
+    }
+    return next;
+  };
+
   return (
     <div>
-      <label htmlFor={inputId} className="block text-sm text-foreground">
-        {label}
-      </label>
+      <div className="flex items-center justify-between gap-2">
+        <label htmlFor={inputId} className="block text-sm text-foreground">
+          {label}
+        </label>
+        {headerRight ? <div className="flex items-center gap-2">{headerRight}</div> : null}
+      </div>
       <input
         id={inputId}
         type="number"
@@ -49,7 +66,11 @@ export function ZzolNumberInput({
             return;
           }
           const next = Number(raw);
-          onValueChange?.(Number.isNaN(next) ? "" : next);
+          if (Number.isNaN(next)) {
+            onValueChange?.("");
+            return;
+          }
+          onValueChange?.(clampToRange(next));
         }}
         disabled={disabled}
         inputMode="numeric"
