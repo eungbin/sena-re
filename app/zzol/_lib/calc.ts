@@ -1,7 +1,26 @@
 import type { ZzolFormState, ZzolResults } from "./types";
 
+/**
+ * 쫄몹 관련 상수
+ */
 const ZZOL_MONSTER_COUNT = 8;
 const ZZOL_SPEND_KEY_PER_GAME = 12;
+
+/**
+ * 열쇠 획득량 상수
+ */
+const WEEKEND_PUSH_KEY_COUNT = 200; // 주말 푸시보상 (1주에 200개)
+const ATTEMP_300_PER_DAILY_KEY_COUNT = 24; // 300일 출석표(10일에 240개, 1일에 24개)
+const UPDATE_KEY_COUNT = 100; // 정기정검 보상 열쇠(2주에 100개)
+const RELAY_KEY_COUNT = 30; // 릴레이 열쇠(2주에 30개)
+
+/**
+ * 루비 획득량 상수
+ */
+const ATTEMP_300_PER_DAILY_RUBY_COUNT = 20; // 300일 출석표(10일에 200루비, 1일에 20루비)
+const WEEKEND_BOOST_RUBY_COUNT = 100; // 주말 부스트 루비(1주에 100루비)
+const RELAY_RUBY_COUNT = 50; // 릴레이 루비(2주에 50루비)
+
 
 /**
  * 쫄작 계산기 결과 계산
@@ -13,9 +32,9 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
   let dailyGetRubyCount: number = 0; // 하루 총 루비 획득량
   let dailySpendRubyCount: number = 0; // 하루 총 루비 소비량
 
-  dailyGetKeyCount += getDailyKeyCount(_state);
+  dailyGetKeyCount += getDailyKeyCount(_state) + ATTEMP_300_PER_DAILY_KEY_COUNT
   console.log('일일 열쇠 획득량(기본): ', dailyGetKeyCount);
-  dailyGetRubyCount += getDailyRubyCount(_state);
+  dailyGetRubyCount += getDailyRubyCount(_state) + ATTEMP_300_PER_DAILY_RUBY_COUNT
   console.log('일일 루비 획득량(기본): ', dailyGetRubyCount);
 
   const keyFromRuby: { dailySpendRuby: number, keyCount: number } = getDailyRubySpendForKey(_state);
