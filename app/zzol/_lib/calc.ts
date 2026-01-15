@@ -70,7 +70,7 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
       weeks4: convertFormatNumberWithComma(totalZzolCount),
     },
     nightmareLegendAccessoryCeiling: {
-      duration: '0일',
+      duration: convertFormatNumberWithComma(getLegendaryAccessoryCount(totalZzolGameCount)),
     }
   };
 }
@@ -210,4 +210,11 @@ function feasibleZzol(num: number, baseKey: number): boolean {
   const need = 12 * num;
   const have = baseKey + expeditionReward(num);
   return need <= have;
+}
+
+function getLegendaryAccessoryCount(count: number): number {
+  const MAX_COUNT = 15000;
+  console.log(count);
+
+  return Math.round(MAX_COUNT / (count/28));
 }
