@@ -22,7 +22,7 @@ export function ZzolQuickValueButtons({
           type="button"
           onClick={() => onSelect(b.value)}
           disabled={disabled}
-          className="cursor-pointer rounded-lg border border-border bg-background/60 px-3 py-1 text-xs text-foreground transition-colors duration-150 hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 active:bg-background/80 disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100"
+          className="cursor-pointer rounded-lg border border-border bg-background/60 px-3 py-1 text-xs text-foreground hover:border-accent hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-background/80 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {b.label}
         </button>

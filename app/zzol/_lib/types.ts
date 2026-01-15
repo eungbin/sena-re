@@ -2,6 +2,8 @@ export type ZzolTotalWarTier = "normal" | "advanced" | "rare" | "legend";
 
 export type ZzolKeyBox = "none" | "50" | "80" | "100" | "120";
 
+export type ZzolSenaPass = "none" | "basic" | "plus";
+
 export type ZzolTowerMedal = "90" | "120";
 
 export type ZzolFormState = {
@@ -11,6 +13,7 @@ export type ZzolFormState = {
 
   // 열쇠상자
   keyBox: ZzolKeyBox;
+  senaPass: ZzolSenaPass;
 
   // 7일 단위
   weeklyHonorShopCount: number | "";

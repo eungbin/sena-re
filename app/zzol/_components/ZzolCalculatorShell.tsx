@@ -14,6 +14,7 @@ const initialState: ZzolFormState = {
   isRubyMonthly: false,
   isKeyMonthly: false,
   keyBox: "none",
+  senaPass: "none",
   weeklyHonorShopCount: "",
   weeklyGuildShopCount: "",
   monthlyArenaShopCount: "",

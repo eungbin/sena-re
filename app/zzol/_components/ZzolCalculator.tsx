@@ -3,6 +3,7 @@
 import type {
   ZzolFormState,
   ZzolKeyBox,
+  ZzolSenaPass,
   ZzolTotalWarTier,
   ZzolTowerMedal,
 } from "../_lib/types";
@@ -25,6 +26,12 @@ export function ZzolCalculator({ value, onChange }: ZzolCalculatorProps) {
     { value: "80", label: "80루비" },
     { value: "100", label: "100루비" },
     { value: "120", label: "120루비" },
+  ];
+
+  const senaPassOptions: { value: ZzolSenaPass; label: string }[] = [
+    { value: "none", label: "포함안함" },
+    { value: "basic", label: "기본" },
+    { value: "plus", label: "플러스+" },
   ];
 
   const totalWarTierOptions: { value: ZzolTotalWarTier; label: string }[] = [
@@ -57,7 +64,7 @@ export function ZzolCalculator({ value, onChange }: ZzolCalculatorProps) {
           />
         </div>
       </ZzolSection>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <ZzolSection title="열쇠상자">
         <div className="max-w-sm">
           <ZzolSelect
@@ -70,6 +77,20 @@ export function ZzolCalculator({ value, onChange }: ZzolCalculatorProps) {
           />
         </div>
       </ZzolSection>
+
+      <ZzolSection title="세나패스">
+        <div className="max-w-sm">
+          <ZzolSelect
+            name="senaPass"
+            label="세나패스"
+            value={value.senaPass}
+            onValueChange={(v) => onChange("senaPass", v as ZzolSenaPass)}
+            options={senaPassOptions}
+            helperText='기본값은 "포함안함"입니다.'
+          />
+        </div>
+      </ZzolSection>
+      </div>
 
       <ZzolSection title="7일 단위 상점에서 구매할 열쇠 개수">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

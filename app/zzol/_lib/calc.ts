@@ -1,4 +1,4 @@
-import type { ZzolFormState, ZzolResults, ZzolTotalWarTier, ZzolTowerMedal } from "./types";
+import type { ZzolFormState, ZzolResults, ZzolTotalWarTier, ZzolTowerMedal, ZzolSenaPass } from "./types";
 import { constants } from "./constants";
 import { convertFormatNumberWithComma, toNumberOrZero } from "@/app/_utils/number";
 
@@ -11,6 +11,7 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
   let fourWeeksGetRubyCount: number = 0; // 4주 총 루비 획득량
   let fourWeeksSpendKeyCount: number = 0; // 4주 총 열쇠 소비량
   let fourWeeksSpendRubyCount: number = 0; // 4주 총 루비 소비량
+  const senaPass: { key: number, ruby: number } = fromSenaPass(_state.senaPass);
 
   fourWeeksGetKeyCount += (getDailyKeyCount(_state) + constants.ATTEMP_300_KEY_COUNT_PER_DAILY) * 28
                                                     + constants.WEEKEND_PUSH_KEY_COUNT * 4
@@ -20,26 +21,39 @@ export function calcZzolResults(_state: ZzolFormState): ZzolResults {
                                                     + toNumberOrZero(_state.weeklyGuildShopCount) * 60 * 4
                                                     + toNumberOrZero(_state.monthlyArenaShopCount) * 60
                                                     + toNumberOrZero(_state.monthlyGuildWarShopCount) * 60
-                                                    + toNumberOrZero(_state.monthlyTotalWarShopCount) * 60;
+                                                    + toNumberOrZero(_state.monthlyTotalWarShopCount) * 60
+                                                    + senaPass.key;
   fourWeeksGetRubyCount += (getDailyRubyCount(_state) + constants.ATTEMP_300_RUBY_COUNT_PER_DAILY) * 28
                                                       + constants.WEEKEND_BOOST_RUBY_COUNT * 4
                                                       + constants.RELAY_RUBY_COUNT_PER_2WEEKS * 2
                                                       + constants.MONTHLY_RUBY_RUBY_COUNT * 1
-                                                      + constants.MONTHLY_KEY_RUBY_COUNT * 1;
+                                                      + constants.MONTHLY_KEY_RUBY_COUNT * 1
+                                                      + senaPass.ruby;
 
   const keyFromRuby: { dailySpendRuby: number, keyCount: number } = getDailyRubySpendForKey(_state);
 
-  fourWeeksGetKeyCount += keyFromRuby.keyCount * 28;
+  fourWeeksGetKeyCount += keyFromRuby.keyCount * 28 - toNumberOrZero(_state.dailyRaidCount) * 12 * 28;
   fourWeeksSpendRubyCount += keyFromRuby.dailySpendRuby * 28 + toNumberOrZero(_state.dailyRubySpend) * 28;
 
+  /**
+   * 이분탐색으로 쫄작 원정대 보상을 포함한 쫄작 게임 횟수를 구한다.
+   */
+  let lo = 0;
+  let hi = Math.floor(fourWeeksGetKeyCount / constants.ZZOL_SPEND_KEY_PER_GAME) + 1;
+  while(feasibleZzol(hi, fourWeeksGetKeyCount)) hi *= 2;
+
+  while(lo + 1 < hi) {
+    const mid = Math.floor((lo+hi)/2);
+    if(feasibleZzol(mid, fourWeeksGetKeyCount)) lo = mid;
+    else hi = mid;
+  }
+  const totalZzolGameCount: number = lo; // 총 쫄작 게임 횟수
   const rubyFromZzol: { oneCycleGetRuby: number, oneCycleSpendKey: number, oneCycleCount: number } = getDailyRubyFromZzol(_state);
-  const totalZzolCycleCount: number = fourWeeksGetKeyCount/rubyFromZzol.oneCycleSpendKey; // 총 쫄작 사이클 횟수
-  const totalZzolGameCount: number = totalZzolCycleCount * rubyFromZzol.oneCycleCount; // 총 쫄작 게임 횟수
+  const totalZzolCycleCount: number = totalZzolGameCount / rubyFromZzol.oneCycleCount; // 총 쫄작 사이클 횟수
   const totalZzolCount: number = totalZzolCycleCount * constants.ZZOL_MONSTER_COUNT; // 총 쫄몹
-  const spendKeyForZzol: number = totalZzolGameCount * constants.ZZOL_SPEND_KEY_PER_GAME; // 쫄작에 사용하는 총 열쇠 개수
   const getRubyForZzol: number = rubyFromZzol.oneCycleGetRuby * totalZzolCycleCount; // 쫄작에서 획득하는 총 루비 개수
   
-  fourWeeksSpendKeyCount += spendKeyForZzol + toNumberOrZero(_state.dailyRaidCount) * 12;
+  // fourWeeksSpendKeyCount += spendKeyForZzol;
   fourWeeksGetRubyCount += getRubyForZzol + getRubyFromTotalWar(_state.totalWarTier) + getRubyFromTowerMedal(_state.towerMedal);
 
   const fourWeeksGetRuby: number = Math.floor(fourWeeksGetRubyCount - fourWeeksSpendRubyCount);
@@ -162,4 +176,38 @@ function getRubyFromTowerMedal(medal: ZzolTowerMedal): number {
     '120': 2000,
   };
   return RUBY_FROM_TOWER_MEDAL[medal];
+}
+
+function fromSenaPass(senaPass: ZzolSenaPass): { key: number, ruby: number } {
+  const RUBY_FROM_SENA_PASS = {
+    'none': { key: 0, ruby: 0},
+    'basic': { key: 480, ruby: 500},
+    'plus': { key: 1080, ruby: 2900}
+  };
+  return RUBY_FROM_SENA_PASS[senaPass];
+}
+
+function expeditionReward(num: number): number {
+  const CYCLE = 1080;
+  const CYCLE_REWARD = 270;
+  const milestones = [
+    { at: 70, key: 50 },
+    { at: 360, key: 60 },
+    { at: 440, key: 50 },
+    { at: 760, key: 60 },
+    { at: 840, key: 50}
+  ]
+  const full = Math.floor(num / CYCLE);
+  const rem = num % CYCLE;
+  let r = full * CYCLE_REWARD;
+  for(const m of milestones) {
+    if(rem >= m.at) r += m.key;
+  }
+  return r;
+}
+
+function feasibleZzol(num: number, baseKey: number): boolean {
+  const need = 12 * num;
+  const have = baseKey + expeditionReward(num);
+  return need <= have;
 }
