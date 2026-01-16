@@ -3,7 +3,7 @@
 import { useMemo, useReducer } from "react";
 import { calcZzolResults } from "../_lib/calc";
 import type { ZzolFormState } from "../_lib/types";
-import { ZzolResultsFloatingPanel } from "./ZzolResultsFloatingPanel";
+import { ZzolResultsFloatingPanel } from "./panels/ZzolResultsFloatingPanel";
 import { ZzolCalculator } from "./ZzolCalculator";
 
 type Action =

@@ -7,12 +7,12 @@ import type {
   ZzolTotalWarTier,
   ZzolTowerMedal,
 } from "../_lib/types";
-import { ZzolButtonRadioGroup } from "./ZzolButtonRadioGroup";
-import { ZzolCheckbox } from "./ZzolCheckbox";
-import { ZzolNumberInput } from "./ZzolNumberInput";
-import { ZzolQuickValueButtons } from "./ZzolQuickValueButtons";
-import { ZzolSection } from "./ZzolSection";
-import { ZzolSelect } from "./ZzolSelect";
+import { ZzolButtonRadioGroup } from "./_ui/ZzolButtonRadioGroup";
+import { ZzolCheckbox } from "./_ui/ZzolCheckbox";
+import { ZzolNumberInput } from "./_ui/ZzolNumberInput";
+import { ZzolQuickValueButtons } from "./_ui/ZzolQuickValueButtons";
+import { ZzolSection } from "./_ui/ZzolSection";
+import { ZzolSelect } from "./_ui/ZzolSelect";
 
 type ZzolCalculatorProps = {
   value: ZzolFormState;

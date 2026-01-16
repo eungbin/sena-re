@@ -6,7 +6,7 @@ type PageContainerProps = {
 };
 
 const BASE_CLASS_NAME =
-  "mx-auto flex w-full max-w-5xl flex-col gap-3 px-6 py-8 lg:py-16";
+  "mx-auto flex w-full max-w-5xl flex-col gap-3 px-6 py-4 lg:py-8";
 
 export function PageContainer({ children, className }: PageContainerProps) {
   const merged = className ? `${BASE_CLASS_NAME} ${className}` : BASE_CLASS_NAME;

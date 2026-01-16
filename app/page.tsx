@@ -1,8 +1,9 @@
 import { QuickLinkCard } from "./_components/QuickLinkCard";
+import { PageContainer } from "./_components/PageContainer";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 py-16">
+    <PageContainer>
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">세븐나이츠-리버스</h1>
         <p className="text-muted">
@@ -23,7 +24,7 @@ export default function Home() {
           />
           <QuickLinkCard
             title="장비 시뮬레이션"
-            description="장비 강화 및 재구성 시뮬레이션"
+            description="장비 재구성 시뮬레이션"
             href="/equipment"
           />
           <QuickLinkCard
@@ -33,6 +34,6 @@ export default function Home() {
           />
         </div>
       </section>
-    </main>
+    </PageContainer>
   );
 }
