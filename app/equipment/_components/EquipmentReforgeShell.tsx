@@ -1,49 +1,33 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { EquipmentItem } from "../_lib/types";
+import { useState } from "react";
 import { ReforgeTabs } from "./ReforgeTabs";
 import { InventoryPanel } from "./panels/InventoryPanel";
 import { EquipmentRegisterDialog } from "./panels/EquipmentRegisterDialog";
 import { PreviewPanel } from "./panels/PreviewPanel";
 import { RulesPanel } from "./panels/RulesPanel";
 import { SelectedEquipmentPanel } from "./panels/SelectedEquipmentPanel";
+import { useEquipmentReforge } from "../_lib/useEquipmentReforge";
 
 export function EquipmentReforgeShell() {
   const [activeTab] = useState<"redistribute">("redistribute");
-  const [equipmentList, setEquipmentList] = useState<EquipmentItem[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [lockedSubOptionId, setLockedSubOptionId] = useState<string | null>(null); // 최대 1개 잠금
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-
-  const selected = useMemo(
-    () => equipmentList.find((x) => x.id === selectedId) ?? null,
-    [equipmentList, selectedId],
-  );
-
-  const totalPlus = useMemo(() => {
-    if (!selected) return 0;
-    return selected.subOptions.reduce((acc, cur) => acc + cur.plus, 0);
-  }, [selected]);
-
-  const canLock = useMemo(() => {
-    if (!selected) return false;
-    return selected.subOptions.length > 0;
-  }, [selected]);
-
-  const onSelectEquipment = (id: string) => {
-    setSelectedId(id);
-    setLockedSubOptionId(null);
-  };
-
-  const onToggleLock = (subOptionId: string) => {
-    setLockedSubOptionId((prev) => (prev === subOptionId ? null : subOptionId));
-  };
-
-  const onResetSelection = () => {
-    setLockedSubOptionId(null);
-    setSelectedId(null);
-  };
+  const {
+    equipmentList,
+    selectedId,
+    selected,
+    lockedSubOptionId,
+    totalPlus,
+    canLock,
+    isRegisterOpen,
+    selectEquipment,
+    toggleLock,
+    clearLock,
+    resetSelection,
+    openRegister,
+    closeRegister,
+    createEquipment,
+    deleteEquipment,
+  } = useEquipmentReforge();
 
   return (
     <div className="mt-4">
@@ -62,9 +46,9 @@ export function EquipmentReforgeShell() {
             totalPlus={totalPlus}
             lockedSubOptionId={lockedSubOptionId}
             canLock={canLock}
-            onToggleLock={onToggleLock}
-            onResetSelection={onResetSelection}
-            onClearLock={() => setLockedSubOptionId(null)}
+            onToggleLock={toggleLock}
+            onResetSelection={resetSelection}
+            onClearLock={clearLock}
             onExecuteRedistribute={() => {
               // UI only: 로직 연결 전
             }}
@@ -75,8 +59,9 @@ export function EquipmentReforgeShell() {
           <InventoryPanel
             equipmentList={equipmentList}
             selectedId={selectedId}
-            onSelectEquipment={onSelectEquipment}
-            onOpenRegister={() => setIsRegisterOpen(true)}
+            onSelectEquipment={selectEquipment}
+            onOpenRegister={openRegister}
+            onDeleteEquipment={deleteEquipment}
           />
           <PreviewPanel />
         </div>
@@ -84,13 +69,8 @@ export function EquipmentReforgeShell() {
 
       <EquipmentRegisterDialog
         open={isRegisterOpen}
-        onClose={() => setIsRegisterOpen(false)}
-        onCreate={(item) => {
-          // UI only: 로직 연결 전. 등록 데이터를 저장/검증하는 로직은 여기서 대체하면 됩니다.
-          setEquipmentList((prev) => [item, ...prev]);
-          setSelectedId(item.id);
-          setLockedSubOptionId(null);
-        }}
+        onClose={closeRegister}
+        onCreate={createEquipment}
       />
     </div>
   );

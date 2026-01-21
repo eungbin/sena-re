@@ -11,11 +11,13 @@ export function InventoryPanel({
   selectedId,
   onSelectEquipment,
   onOpenRegister,
+  onDeleteEquipment,
 }: {
   equipmentList: EquipmentItem[];
   selectedId: string | null;
   onSelectEquipment: (id: string) => void;
   onOpenRegister: () => void;
+  onDeleteEquipment: (id: string) => void;
 }) {
   return (
     <Panel title="장비 선택" description="등록하신 장비를 선택해 주세요.">
@@ -43,6 +45,7 @@ export function InventoryPanel({
                 item={item}
                 selected={item.id === selectedId}
                 onClick={() => onSelectEquipment(item.id)}
+                onDelete={onDeleteEquipment}
               />
             ))}
           </div>

@@ -9,15 +9,25 @@ export function EquipmentTile({
   item,
   selected,
   onClick,
+  onDelete,
 }: {
   item: EquipmentItem;
   selected?: boolean;
   onClick?: () => void;
+  onDelete?: (id: string) => void;
 }) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (!onClick) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={cx(
         "group flex w-full flex-col items-start gap-1 rounded-xl border p-3 text-left transition-colors cursor-pointer",
         selected
@@ -33,9 +43,23 @@ export function EquipmentTile({
             <div className="truncate text-sm font-semibold text-foreground">{item.name}</div>
           </div>
         </div>
+        {onDelete ? (
+          <button
+            type="button"
+            aria-label="장비 삭제"
+            title="삭제"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item.id);
+            }}
+            className="cursor-pointer shrink-0 inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background/20 text-base leading-none text-muted transition-colors hover:border-red-500/40 hover:bg-red-500/10 hover:text-foreground"
+          >
+            ×
+          </button>
+        ) : null}
       </div>
       <div className="mt-1 line-clamp-2 text-xs text-muted">{item.mainOptionLabel}</div>
-    </button>
+    </div>
   );
 }
 
